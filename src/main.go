@@ -10,6 +10,18 @@ import (
 	"github.com/porty/emitter"
 )
 
+type settings struct {
+	postURL      string
+	postInterval time.Duration
+	tryCount     int
+}
+
+var s = settings{
+	postURL:      "http://localhost:3000/events",
+	postInterval: 5 * time.Second,
+	tryCount:     3,
+}
+
 type Events struct {
 	TransmitTime time.Time       `json:"time"`
 	Events       []emitter.Event `json:"events"`
@@ -30,8 +42,8 @@ func actuallySendEvents(e *Events) {
 		return
 	}
 
-	for i := 0; i < 3; i++ {
-		resp, err := http.Post("http://localhost:3000/events", "application/json", bytes.NewReader(b))
+	for i := 0; i < s.tryCount; i++ {
+		resp, err := http.Post(s.postURL, "application/json", bytes.NewReader(b))
 
 		if err == nil {
 			if resp.StatusCode >= 300 {
@@ -59,7 +71,7 @@ func sendEvents() {
 
 func loopies(c chan emitter.Event) {
 	for {
-		t := time.NewTicker(5 * time.Second)
+		t := time.NewTicker(s.postInterval)
 
 		select {
 		case e := <-c:
