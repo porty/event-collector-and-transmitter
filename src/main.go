@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -14,12 +15,14 @@ type settings struct {
 	postURL      string
 	postInterval time.Duration
 	tryCount     int
+	eventCap     int
 }
 
 var s = settings{
 	postURL:      "http://localhost:3000/events",
 	postInterval: 5 * time.Second,
 	tryCount:     3,
+	eventCap:     50,
 }
 
 type Events struct {
@@ -34,6 +37,12 @@ func addEvent(e emitter.Event) {
 }
 
 func actuallySendEvents(e *Events) {
+
+	if len(e.Events) > s.eventCap {
+		log.Printf("Found %d events to send, trimming to %d", len(e.Events), s.eventCap)
+		e.Events = e.Events[:s.eventCap]
+	}
+
 	e.TransmitTime = time.Now()
 
 	b, err := json.Marshal(e)
