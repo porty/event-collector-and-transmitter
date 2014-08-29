@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
@@ -32,17 +31,19 @@ type Events struct {
 
 var events *Events
 
+var droppingEvents = false
+
 func addEvent(e emitter.Event) {
-	events.Events = append(events.Events, e)
+	if len(events.Events) < s.eventCap {
+		events.Events = append(events.Events, e)
+	} else if !droppingEvents {
+		droppingEvents = true
+		fmt.Println("Too many events! They are being dropped!")
+	}
+
 }
 
 func actuallySendEvents(e *Events) {
-
-	if len(e.Events) > s.eventCap {
-		log.Printf("Found %d events to send, trimming to %d", len(e.Events), s.eventCap)
-		e.Events = e.Events[:s.eventCap]
-	}
-
 	e.TransmitTime = time.Now()
 
 	b, err := json.Marshal(e)
@@ -71,6 +72,7 @@ func sendEvents() {
 		// allocate new Events struct so that the goroutine has its own copy
 		eventsToSend := events
 		events = &Events{}
+		droppingEvents = false
 
 		go actuallySendEvents(eventsToSend)
 	}
