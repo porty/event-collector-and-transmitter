@@ -18,7 +18,7 @@ type settings struct {
 }
 
 var s = settings{
-	postURL:      "http://localhost:3000/events",
+	postURL:      "http://lenny.compassuav.com/events",
 	postInterval: 5 * time.Second,
 	tryCount:     3,
 	eventCap:     50,
