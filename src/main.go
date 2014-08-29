@@ -59,13 +59,11 @@ func actuallySendEvents(e *Events) {
 
 func sendEvents() {
 	if len(events.Events) > 0 {
-		fmt.Println("I have events to send!")
+		// allocate new Events struct so that the goroutine has its own copy
 		eventsToSend := events
 		events = &Events{}
 
 		go actuallySendEvents(eventsToSend)
-	} else {
-		fmt.Println("Nothing to send :(")
 	}
 }
 
