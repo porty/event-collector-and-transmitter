@@ -48,7 +48,7 @@ func actuallySendEvents(e *Events) {
 
 	b, err := json.Marshal(e)
 	if err != nil {
-		fmt.Println("Failed to JSON Events: " + err.Error())
+		fmt.Println("Failed to marshal events to JSON: " + err.Error())
 		return
 	}
 
@@ -59,7 +59,7 @@ func actuallySendEvents(e *Events) {
 			if resp.StatusCode >= 300 {
 				fmt.Println("Server returned bad response: " + resp.Status)
 			}
-			fmt.Println("Sent good :)")
+			fmt.Printf("Transmitted %d events (%d bytes)\n", len(e.Events), len(b))
 			return
 		}
 
@@ -101,12 +101,14 @@ func main() {
 	go loopies(c)
 
 	for {
-		fmt.Println("Waiting...")
+		fmt.Printf("ECAT ready. Transmitting events every %f seconds to %s\n",
+			s.postInterval.Seconds(),
+			s.postURL,
+		)
 		e, err := a.WaitForEvent()
 		if err != nil {
 			fmt.Println("Failed event: " + err.Error())
 		}
-		fmt.Println("OMG i has event")
 
 		c <- *e
 
