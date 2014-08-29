@@ -100,11 +100,12 @@ func main() {
 	c := make(chan emitter.Event)
 	go loopies(c)
 
+	fmt.Printf("ECAT ready.\nTransmitting events every %d seconds to %s\n",
+		int(s.postInterval.Seconds()),
+		s.postURL,
+	)
+
 	for {
-		fmt.Printf("ECAT ready. Transmitting events every %d seconds to %s\n",
-			int(s.postInterval.Seconds()),
-			s.postURL,
-		)
 		e, err := a.WaitForEvent()
 		if err != nil {
 			fmt.Println("Failed event: " + err.Error())
