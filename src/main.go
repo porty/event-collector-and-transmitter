@@ -101,8 +101,8 @@ func main() {
 	go loopies(c)
 
 	for {
-		fmt.Printf("ECAT ready. Transmitting events every %f seconds to %s\n",
-			s.postInterval.Seconds(),
+		fmt.Printf("ECAT ready. Transmitting events every %d seconds to %s\n",
+			int(s.postInterval.Seconds()),
 			s.postURL,
 		)
 		e, err := a.WaitForEvent()
