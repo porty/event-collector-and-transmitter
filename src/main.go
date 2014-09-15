@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -38,7 +38,7 @@ func addEvent(e emitter.Event) {
 		events.Events = append(events.Events, e)
 	} else if !droppingEvents {
 		droppingEvents = true
-		fmt.Println("Too many events! They are being dropped!")
+		log.Println("Too many events! They are being dropped!")
 	}
 
 }
@@ -48,7 +48,7 @@ func actuallySendEvents(e *Events) {
 
 	b, err := json.Marshal(e)
 	if err != nil {
-		fmt.Println("Failed to marshal events to JSON: " + err.Error())
+		log.Println("Failed to marshal events to JSON: " + err.Error())
 		return
 	}
 
@@ -57,13 +57,13 @@ func actuallySendEvents(e *Events) {
 
 		if err == nil {
 			if resp.StatusCode >= 300 {
-				fmt.Println("Server returned bad response: " + resp.Status)
+				log.Println("Server returned bad response: " + resp.Status)
 			}
-			fmt.Printf("Transmitted %d events (%d bytes)\n", len(e.Events), len(b))
+			log.Printf("Transmitted %d events (%d bytes)\n", len(e.Events), len(b))
 			return
 		}
 
-		fmt.Println("Failed to post events: " + err.Error())
+		log.Println("Failed to post events: " + err.Error())
 	}
 }
 
@@ -100,7 +100,7 @@ func main() {
 	c := make(chan emitter.Event)
 	go loopies(c)
 
-	fmt.Printf("ECAT ready.\nTransmitting events every %d seconds to %s\n",
+	log.Printf("ECAT ready.\nTransmitting events every %d seconds to %s\n",
 		int(s.postInterval.Seconds()),
 		s.postURL,
 	)
@@ -108,7 +108,7 @@ func main() {
 	for {
 		e, err := a.WaitForEvent()
 		if err != nil {
-			fmt.Println("Failed event: " + err.Error())
+			log.Println("Failed event: " + err.Error())
 		}
 
 		c <- *e
