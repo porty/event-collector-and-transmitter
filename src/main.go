@@ -79,9 +79,9 @@ func sendEvents() {
 }
 
 func loopies(c chan emitter.Event) {
-	for {
-		t := time.NewTicker(s.postInterval)
+	t := time.NewTicker(s.postInterval)
 
+	for {
 		select {
 		case e := <-c:
 			addEvent(e)
